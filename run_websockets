@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "If you run into 'max threads' issues, check your ulimit"
+echo "On my mac I was only able to push mine as far as:  max user processes              (-u) 1064"
+
+java -server -Xmx2G -jar target/socketio-stress.jar 20 500 websocket
