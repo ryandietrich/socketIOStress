@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -server -Xmx2G -jar target/socketio-stress.jar 200 1000
+java -server -Xmx2G -jar target/socketio-stress.jar 20 1000 polling

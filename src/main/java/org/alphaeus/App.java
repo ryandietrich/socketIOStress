@@ -11,6 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.github.nkzawa.emitter.Emitter;
+
+import com.github.nkzawa.engineio.client.Transport;
+import com.github.nkzawa.engineio.client.transports.Polling;
+import com.github.nkzawa.engineio.client.transports.WebSocket;
+
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -21,10 +26,9 @@ public class App {
     public static AtomicLong counter = new AtomicLong(5);
     public static AtomicLong connectionCount = new AtomicLong(5);
     public static Random r = new Random();
+    public static IO.Options opts;
 
     public static void createSocket( final int id ) {
-        IO.Options opts = new IO.Options();
-        opts.forceNew = true;
 
         try {
             final Socket sck = IO.socket("http://localhost:9092", opts);
@@ -99,11 +103,23 @@ public class App {
     }
 
     public static void main(String... args ) throws Exception {
+        opts = new IO.Options();
+        opts.forceNew = true;
+
         if ( args.length > 0 )
             connectionCount.set(Long.parseLong(args[0]));
 
         if ( args.length > 1 )
             counter.set(Long.parseLong(args[1]));
+
+        if ( args.length > 2 ) {
+            if ( args[2].equals("websocket") ) {
+                opts.transports = new String[] {WebSocket.NAME};
+
+            } else if ( args[2].equals("polling") ) {
+                opts.transports = new String[] {Polling.NAME};
+            }
+        }
 
         System.out.println("Going to create " + counter + " connections to the SocketIO server");
 
@@ -112,10 +128,10 @@ public class App {
         for ( int ii = 0; ii < connectionCount.get(); ii++ )
             App.createSocket(ii);
 
-        System.out.println("Done creating connections");
+        System.out.println("Done creating connections: thread count =" + java.lang.Thread.activeCount());
 
         while ( successCount.get() < counter.get() ) {
-            System.out.println(new Date() + " " + successCount.get() + " of " + counter + " completed");
+            System.out.println(new Date() + " " + successCount.get() + " of " + counter + " completed, thread count = " + java.lang.Thread.activeCount());
             Thread.sleep(100);
         }
         System.out.println(new Date() + " " + successCount.get() + " of " + counter + " completed");
