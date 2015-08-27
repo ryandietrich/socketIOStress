@@ -1,2 +1,1 @@
-# socketIOStress
-A simple SocketIO connection stress testing tool
+* Simple socketIO stress tester
